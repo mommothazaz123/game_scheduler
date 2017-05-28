@@ -1,7 +1,7 @@
 '''
 Created on Apr 23, 2017
 
-scp -r * pi@raspberrypi.local:/home/pi/Desktop/Discord/selfbot
+scp -r * pi@raspberrypi.local:/home/pi/Desktop/Discord/game_scheduler
 
 @author: zhu.exe
 '''
@@ -19,6 +19,7 @@ handler = logging.FileHandler(filename='bot.log', encoding='utf-8', mode='w')
 log.addHandler(handler)
 
 bot = commands.Bot(command_prefix=".")
+bot.remove_command("help")
 
 initial_extensions = [
     'cogs.scheduler'
@@ -34,7 +35,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if not hasattr(message, "server"): return
+    if message.server is None: return
     if not message.server.id == "211219033658228739": return #only listen to Discord & Dragons
     await bot.process_commands(message)
 

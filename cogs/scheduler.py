@@ -19,7 +19,7 @@ class Scheduler:
                 if message.author == g['dm'] and message.content == '--': # ends games
                     self.games.remove(g)
                     await self.bot.delete_channel(message.channel)
-                    await self.bot.send_message(message.author, "Planning ended! Final player list: {}\nPingstring: ".format(", ".join(p.mention for p in g['players']), " ".join("@" + str(p) for p in g['players'])))
+                    await self.bot.send_message(message.author, "Planning ended! Final player list: {}\nPingstring: {}".format(", ".join(p.mention for p in g['players']), " ".join("@" + str(p) for p in g['players'])))
                 if message.content == '+': # joins game
                     if message.author in g['players']: await self.bot.send_message(message.author, "You are already the game DMed by {}.".format(g['dm'].mention))
                     elif len(g['players']) < g['maxp']: 
@@ -35,7 +35,7 @@ class Scheduler:
                         await self.bot.send_message(message.author, "You have been removed from the game DMed by {}.".format(g['dm'].mention)) 
                     else:
                         await self.bot.send_message(message.author, "You cannot leave a game you aren't in.")
-                await self.bot.delete_message(message)
+                if not message.author == g['dm']: await self.bot.delete_message(message)
     
     @commands.command(pass_context=True)
     async def startgame(self, ctx, max_players:int=6, *, desc="No description."):
@@ -45,7 +45,7 @@ class Scheduler:
         if not ctx.message.author.id in self.dm_ids: return await self.bot.say("You are not a Dragon's Wake DM!")
         chan = await self.bot.create_channel(ctx.message.server, "game-planning")
         await self.bot.say("Game announced! To join, type `+` in {}!".format("<#" + chan.id + ">"))
-        a = await self.bot.send_message(chan, "**PLANNING CHANNEL - Game run by {}!**\nMax players: {}\n{}".format(ctx.message.author.mention, max_players, desc))
+        a = await self.bot.send_message(chan, "**PLANNING CHANNEL - Game run by {}!**\nType `+` to join.\nMax players: {}\n{}".format(ctx.message.author.mention, max_players, desc))
         b = await self.bot.send_message(chan, "Player List: None")
         await self.bot.pin_message(a)
         await self.bot.pin_message(b)
